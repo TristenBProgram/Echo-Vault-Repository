@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme';
 import { formatTime } from '../lib/format';
+import { fractionFromX } from '../lib/controls';
 
 type Props = {
   position: number;
@@ -15,7 +16,7 @@ export function ProgressBar({ position, duration, onSeek }: Props) {
   const [scrub, setScrub] = useState<number | null>(null);
 
   const fraction = scrub ?? (duration > 0 ? Math.min(1, position / duration) : 0);
-  const toFraction = (x: number) => Math.min(1, Math.max(0, x / width));
+  const toFraction = (x: number) => fractionFromX(x, width);
 
   return (
     <View>

@@ -7,6 +7,8 @@ import { useRouter } from 'expo-router';
 import { usePlayer } from '../context/PlayerContext';
 import { Artwork, paletteFor } from '../components/Artwork';
 import { ProgressBar } from '../components/ProgressBar';
+import { VolumeSlider } from '../components/VolumeSlider';
+import { SKIP_SECONDS } from '../lib/controls';
 import { colors, spacing } from '../theme';
 
 export default function NowPlayingScreen() {
@@ -94,7 +96,21 @@ export default function NowPlayingScreen() {
             </Pressable>
           </View>
 
-          {p.error && <Text style={styles.error}>Couldn’t play this file: {p.error}</Text>}
+          <View style={[styles.skipRow, { width: artSize }]}>
+            <SkipButton direction="back" onPress={() => p.skipBy(-SKIP_SECONDS)} />
+            <SkipButton direction="forward" onPress={() => p.skipBy(SKIP_SECONDS)} />
+          </View>
+
+          <View style={{ width: artSize, marginTop: spacing.md }}>
+            <VolumeSlider
+              volume={p.volume}
+              muted={p.muted}
+              onChange={p.setVolume}
+              onToggleMute={p.toggleMute}
+            />
+          </View>
+
+          {p.error && <Text style={styles.error}>{p.error}</Text>}
 
           {upNext.length > 0 && (
             <View style={[styles.upNext, { width: artSize }]}>
@@ -121,6 +137,23 @@ export default function NowPlayingScreen() {
         </ScrollView>
       </SafeAreaView>
     </View>
+  );
+}
+
+function SkipButton({ direction, onPress }: { direction: 'back' | 'forward'; onPress: () => void }) {
+  const back = direction === 'back';
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => [styles.skip, pressed && { opacity: 0.6 }]}
+      accessibilityRole="button"
+      accessibilityLabel={`${back ? 'Back' : 'Forward'} ${SKIP_SECONDS} seconds`}
+    >
+      {back && <Ionicons name="play-back" size={16} color={colors.text} />}
+      <Text style={styles.skipText}>{SKIP_SECONDS}s</Text>
+      {!back && <Ionicons name="play-forward" size={16} color={colors.text} />}
+    </Pressable>
   );
 }
 
@@ -176,6 +209,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
   },
+  skipRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.lg },
+  skip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  skipText: { color: colors.text, fontSize: 13, fontWeight: '600', fontVariant: ['tabular-nums'] },
   error: { color: '#FF8A8A', marginTop: spacing.lg, paddingHorizontal: spacing.xl, textAlign: 'center' },
   upNext: { marginTop: spacing.xxl },
   upNextHeading: { color: colors.text, fontSize: 18, fontWeight: '700', marginBottom: spacing.sm },

@@ -10,6 +10,7 @@ import React, {
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import type { RepeatMode, Track } from '../types';
 import { buildQueue, nextAction, nextRepeatMode, previousAction, toggleShuffleQueue, type NextAction } from '../lib/queue';
+import { clampVolume, seekBy } from '../lib/controls';
 import { useLibrary } from './LibraryContext';
 
 type PlayerContextValue = {
@@ -23,18 +24,52 @@ type PlayerContextValue = {
   shuffle: boolean;
   repeat: RepeatMode;
   error: string | null;
+  /** App volume from 0 (silent) to 1 (full), within the phone's own volume. */
+  volume: number;
+  muted: boolean;
   /** Start playing a list, beginning at `startIndex` (or a random song if shuffling). */
   playTracks: (tracks: Track[], startIndex?: number, opts?: { shuffle?: boolean }) => void;
   togglePlay: () => void;
+  play: () => void;
+  pause: () => void;
   next: () => void;
   previous: () => void;
   seek: (seconds: number) => void;
+  /** Jump forward (positive) or back (negative) by this many seconds. */
+  skipBy: (seconds: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   jumpTo: (queueIndex: number) => void;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
+
+/**
+ * Asks the phone for a music-app audio session (keeps playing in the
+ * background, pauses other apps' audio). iOS can refuse this, for example in
+ * Expo Go or while another app holds the audio, and the refusal can be thrown
+ * straight away rather than as a rejected promise, so everything is awaited
+ * inside try/catch. On refusal we fall back to a basic session that still
+ * plays. Returns true if the full session was granted.
+ */
+async function configureAudioSession(): Promise<boolean> {
+  try {
+    await setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldPlayInBackground: true,
+      interruptionMode: 'doNotMix',
+    });
+    return true;
+  } catch (e) {
+    console.warn('Full audio session unavailable, using basic playback', e);
+    try {
+      await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' });
+    } catch {}
+    return false;
+  }
+}
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const { markPlayed, setDuration } = useLibrary();
@@ -46,37 +81,68 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [index, setIndex] = useState(-1);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState<RepeatMode>('off');
+  const [volume, setVolumeState] = useState(1);
+  const [muted, setMuted] = useState(false);
+  const [playError, setPlayError] = useState<string | null>(null);
 
   // Refs so callbacks always see the latest values.
   const queueRef = useRef(queue);
   const indexRef = useRef(index);
   const repeatRef = useRef(repeat);
+  const volumeRef = useRef(volume);
+  const mutedRef = useRef(muted);
   queueRef.current = queue;
+  volumeRef.current = volume;
+  mutedRef.current = muted;
   indexRef.current = index;
   repeatRef.current = repeat;
 
   const current = index >= 0 ? queue[index] ?? null : null;
 
+  /** Starts playback without letting an iOS audio-session refusal crash the app. */
+  const startPlayback = useCallback(() => {
+    try {
+      player.play();
+      setPlayError(null);
+    } catch (e: any) {
+      console.warn('Could not start playback', e);
+      setPlayError('The phone wouldn’t let audio start. Close other apps playing sound, then tap play again.');
+    }
+  }, [player]);
+
+  // Whether the full (background, lock screen) audio session is active.
+  const fullSessionRef = useRef(false);
+
   useEffect(() => {
-    setAudioModeAsync({
-      playsInSilentMode: true,
-      shouldPlayInBackground: true,
-      interruptionMode: 'doNotMix',
-    }).catch(() => {});
+    configureAudioSession().then(ok => {
+      fullSessionRef.current = ok;
+    });
   }, []);
 
   const load = useCallback(
     (track: Track, autoplay = true) => {
+      // If the full audio session was refused at startup, ask again now
+      // that the person has actually pressed play.
+      if (!fullSessionRef.current) {
+        configureAudioSession().then(ok => {
+          fullSessionRef.current = ok;
+        });
+      }
       player.replace({ uri: track.uri, name: track.title });
-      if (autoplay) player.play();
+      // Carry the chosen volume over to the new song.
+      player.volume = volumeRef.current;
+      player.muted = mutedRef.current;
+      if (autoplay) startPlayback();
       try {
         // Lock screen / notification controls. Needs a development build
         // to show up; harmless in Expo Go.
         player.setActiveForLockScreen(true, { title: track.title, artist: track.artist });
-      } catch {}
+      } catch (e) {
+        console.warn('Lock screen controls unavailable', e);
+      }
       markPlayed(track.id);
     },
-    [player, markPlayed],
+    [player, markPlayed, startPlayback],
   );
 
   const playTracks = useCallback<PlayerContextValue['playTracks']>(
@@ -107,7 +173,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     (action: NextAction) => {
       if (action.type === 'restart') {
         player.seekTo(0);
-        player.play();
+        startPlayback();
       } else if (action.type === 'play') {
         goTo(action.index);
       } else if (action.type === 'stop') {
@@ -115,7 +181,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         goTo(action.index, false);
       }
     },
-    [goTo, player],
+    [goTo, player, startPlayback],
   );
 
   const advance = useCallback(
@@ -136,15 +202,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [current, status.duration, setDuration]);
 
-  const togglePlay = useCallback(() => {
-    if (!current) return;
-    if (status.playing) {
-      player.pause();
-    } else {
-      if (status.duration > 0 && status.currentTime >= status.duration - 0.5) player.seekTo(0);
-      player.play();
-    }
-  }, [current, player, status.playing, status.currentTime, status.duration]);
 
   const previous = useCallback(() => {
     const action = previousAction(indexRef.current, status.currentTime);
@@ -153,7 +210,48 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     else perform(action);
   }, [perform, player, status.currentTime]);
 
+  const play = useCallback(() => {
+    if (!current) return;
+    if (status.duration > 0 && status.currentTime >= status.duration - 0.5) player.seekTo(0);
+    startPlayback();
+  }, [current, player, startPlayback, status.currentTime, status.duration]);
+
+  const pause = useCallback(() => player.pause(), [player]);
+
   const seek = useCallback((seconds: number) => player.seekTo(Math.max(0, seconds)), [player]);
+
+  const skipBy = useCallback(
+    (seconds: number) => {
+      if (!current) return;
+      player.seekTo(seekBy(status.currentTime, seconds, status.duration));
+    },
+    [current, player, status.currentTime, status.duration],
+  );
+
+  const setVolume = useCallback(
+    (value: number) => {
+      const v = clampVolume(value);
+      setVolumeState(v);
+      player.volume = v;
+      // Dragging the volume up un-mutes, like most music apps.
+      if (v > 0 && mutedRef.current) {
+        setMuted(false);
+        player.muted = false;
+      }
+    },
+    [player],
+  );
+
+  const toggleMute = useCallback(() => {
+    const next = !mutedRef.current;
+    setMuted(next);
+    player.muted = next;
+    // Un-muting at zero volume would still be silent, so bring it back up.
+    if (!next && volumeRef.current === 0) {
+      setVolumeState(0.5);
+      player.volume = 0.5;
+    }
+  }, [player]);
 
   const toggleShuffle = useCallback(() => {
     const cur = queueRef.current[indexRef.current];
@@ -166,6 +264,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setIndex(next.index);
     setShuffle(!shuffle);
   }, [shuffle, originalQueue]);
+
+  const togglePlay = useCallback(() => {
+    if (status.playing) pause();
+    else play();
+  }, [status.playing, play, pause]);
 
   const cycleRepeat = useCallback(() => {
     setRepeat(nextRepeatMode);
@@ -182,17 +285,24 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       duration: status.duration || current?.duration || 0,
       shuffle,
       repeat,
-      error: status.error ?? null,
+      error: playError ?? (status.error ? `Couldn’t play this file: ${status.error}` : null),
+      volume,
+      muted,
       playTracks,
       togglePlay,
+      play,
+      pause,
       next: () => advance(false),
       previous,
       seek,
+      skipBy,
+      setVolume,
+      toggleMute,
       toggleShuffle,
       cycleRepeat,
       jumpTo: (i: number) => goTo(i),
     }),
-    [current, queue, index, status, shuffle, repeat, playTracks, togglePlay, advance, previous, seek, toggleShuffle, cycleRepeat, goTo],
+    [current, queue, index, status, playError, shuffle, repeat, volume, muted, playTracks, togglePlay, play, pause, advance, previous, seek, skipBy, setVolume, toggleMute, toggleShuffle, cycleRepeat, goTo],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
