@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useCallback,
@@ -8,7 +9,6 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import type { Track } from '../types';
 import { deleteImportedFile, importFromFiles, scanDevice } from '../lib/scanner';
 import { loadSavedState, saveState } from '../lib/storage';
 import {
@@ -19,6 +19,16 @@ import {
   resolveRecent,
   type Artist,
 } from '../lib/tracks';
+import type { Playlist, PlaylistCategory, Track } from '../types';
+
+// Playlist Organizer imports
+import {
+  addSongToPlaylist,
+  getPlaylistTracks,
+  createPlaylist as makePlaylist,
+  removeSongFromPlaylist,
+  renamePlaylist,
+} from '../lib/playlists';
 
 export type { Artist };
 
@@ -37,6 +47,27 @@ type LibraryContextValue = {
   removeTrack: (id: string) => void;
   markPlayed: (id: string) => void;
   setDuration: (id: string, seconds: number) => void;
+
+  // Playlist Organizer
+  playlists: Playlist[];
+  createNewPlaylist: (
+    name: string,
+    category: PlaylistCategory
+  ) => void;
+  deletePlaylist: (id: string) => void;
+  renameExistingPlaylist: (
+    id: string,
+    name: string
+  ) => void;
+  addTrackToPlaylist: (
+    playlistId: string,
+    trackId: string
+  ) => void;
+  removeTrackFromPlaylist: (
+    playlistId: string,
+    trackId: string
+  ) => void;
+  getTracksForPlaylist: (playlistId: string) => Track[];
 };
 
 const LibraryContext = createContext<LibraryContextValue | null>(null);
@@ -49,6 +80,9 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [notice, setNotice] = useState<string | null>(null);
   const loaded = useRef(false);
 
+  // Playlist Organizer state
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+
   // Load what we saved last time, then quietly rescan on Android so new
   // downloads show up without the person having to do anything.
   useEffect(() => {
@@ -57,6 +91,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       if (saved) {
         setTracks(saved.tracks);
         setRecentIds(saved.recentIds);
+        setPlaylists(saved.playlists);
       }
       loaded.current = true;
       setReady(true);
@@ -67,10 +102,10 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save whenever the library changes.
+  // Save whenever the library or playlists change.
   useEffect(() => {
-    if (loaded.current) saveState({ tracks, recentIds });
-  }, [tracks, recentIds]);
+    if (loaded.current) saveState({ tracks, recentIds, playlists });
+  }, [tracks, recentIds, playlists]);
 
   const runScan = useCallback(async (showNotice: boolean) => {
     setScanning(true);
@@ -123,6 +158,75 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  // Create a new playlist
+  const createNewPlaylist = useCallback((
+    name: string,
+    category: PlaylistCategory
+  ) => {
+    const playlist = makePlaylist(name, category);
+    setPlaylists(prev => [...prev, playlist]);
+  }, []);
+
+  // Delete a playlist without deleting songs from the library
+  const deletePlaylist = useCallback((id: string) => {
+    setPlaylists(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  // Rename an existing playlist
+  const renameExistingPlaylist = useCallback((
+    id: string,
+    name: string
+  ) => {
+    setPlaylists(prev =>
+      prev.map(p =>
+        p.id === id ? renamePlaylist(p, name) : p
+      )
+    );
+  }, []);
+
+  // Add a song from the existing EchoVault library
+  const addTrackToPlaylist = useCallback((
+    playlistId: string,
+    trackId: string
+  ) => {
+    if (!tracks.some(t => t.id === trackId)) return;
+
+    setPlaylists(prev =>
+      prev.map(p =>
+        p.id === playlistId
+          ? addSongToPlaylist(p, trackId)
+          : p
+      )
+    );
+  }, [tracks]);
+
+  // Remove a song from a playlist, but keep the audio file
+  const removeTrackFromPlaylist = useCallback((
+    playlistId: string,
+    trackId: string
+  ) => {
+    setPlaylists(prev =>
+      prev.map(p =>
+        p.id === playlistId
+          ? removeSongFromPlaylist(p, trackId)
+          : p
+      )
+    );
+  }, []);
+
+  // Get the actual songs belonging to a playlist
+  const getTracksForPlaylist = useCallback((
+    playlistId: string
+  ): Track[] => {
+    const playlist = playlists.find(
+      p => p.id === playlistId
+    );
+
+    if (!playlist) return [];
+
+    return getPlaylistTracks(playlist, tracks);
+  }, [playlists, tracks]);
+
   const value = useMemo<LibraryContextValue>(() => {
     return {
       tracks,
@@ -138,8 +242,35 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       removeTrack,
       markPlayed,
       setDuration,
+
+      // Playlist Organizer
+      playlists,
+      createNewPlaylist,
+      deletePlaylist,
+      renameExistingPlaylist,
+      addTrackToPlaylist,
+      removeTrackFromPlaylist,
+      getTracksForPlaylist,
     };
-  }, [tracks, recentIds, ready, scanning, notice, scan, importFiles, removeTrack, markPlayed, setDuration]);
+  }, [
+    tracks,
+    recentIds,
+    ready,
+    scanning,
+    notice,
+    scan,
+    importFiles,
+    removeTrack,
+    markPlayed,
+    setDuration,
+    playlists,
+    createNewPlaylist,
+    deletePlaylist,
+    renameExistingPlaylist,
+    addTrackToPlaylist,
+    removeTrackFromPlaylist,
+    getTracksForPlaylist,
+  ]);
 
   return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>;
 }
