@@ -1,0 +1,40 @@
+name: EchoVault CI
+
+on:
+  push:
+    branches:
+      - music-player
+  pull_request:
+    branches:
+      - music-player
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Test and validate app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --runInBand
+
+      - name: Check TypeScript
+        run: npx tsc --noEmit
+
+      - name: Run lint
+        run: npm run lint
