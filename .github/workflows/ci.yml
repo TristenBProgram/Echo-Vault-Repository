@@ -61,24 +61,20 @@ jobs:
         run: npm ci
 
       - name: Publish EAS Update
-        run: npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --non-interactive
+        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --non-interactive'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Publish update announcement
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git fetch origin update-status || true
 
-          if git show-ref --verify --quiet refs/remotes/origin/update-status; then
-            git checkout -B update-status origin/update-status
-          else
-            git checkout --orphan update-status
-            git rm -rf .
-          fi
+          git checkout --orphan update-status
+          git rm -rf . || true
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           cat > update-info.json <<EOF
           {
@@ -90,4 +86,4 @@ jobs:
 
           git add update-info.json
           git commit -m "Update release announcement"
-          git push origin update-status
+          git push --force origin update-status
