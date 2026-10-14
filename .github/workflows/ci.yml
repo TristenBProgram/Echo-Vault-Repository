@@ -44,7 +44,7 @@ jobs:
   deploy:
     name: Publish Expo update
     needs: checks
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/music-player')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/ci-cd-setup' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/music-player')
     runs-on: ubuntu-latest
 
     steps:
