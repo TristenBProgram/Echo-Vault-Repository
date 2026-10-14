@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - music-player
+      - main
   pull_request:
     branches:
       - music-player
+      - main
   workflow_dispatch:
 
 permissions:
@@ -38,3 +40,26 @@ jobs:
 
       - name: Run lint
         run: npm run lint
+    deploy:
+    name: Publish Expo update
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish EAS Update
+        run: npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
