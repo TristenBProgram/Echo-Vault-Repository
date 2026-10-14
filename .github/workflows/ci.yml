@@ -3,6 +3,7 @@ name: EchoVault CI
 on:
   push:
     branches:
+      - ci-cd-setup
       - music-player
       - main
   pull_request:
