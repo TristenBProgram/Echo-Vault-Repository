@@ -61,6 +61,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Publish EAS Update
+        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CI: "1"
+
       - name: Publish update announcement
         shell: bash
         run: |
@@ -83,18 +89,3 @@ jobs:
           git add update-info.json
           git commit -m "Update release announcement"
           git push --force origin update-status
-
-      - name: Check Expo project files
-        run: |
-          pwd
-          ls -la
-          test -f package.json && echo "package.json found"
-          test -f app.json && echo "app.json found" || echo "app.json missing"
-          test -f app.config.js && echo "app.config.js found" || echo "app.config.js missing"
-          test -f app.config.ts && echo "app.config.ts found" || echo "app.config.ts missing"
-          
-      - name: Publish EAS Update
-        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios'
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          CI: "1"
