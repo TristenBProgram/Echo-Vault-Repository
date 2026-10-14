@@ -40,10 +40,11 @@ jobs:
 
       - name: Run lint
         run: npm run lint
-    deploy:
+
+  deploy:
     name: Publish Expo update
     needs: checks
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/music-player')
     runs-on: ubuntu-latest
 
     steps:
@@ -63,6 +64,7 @@ jobs:
         run: npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Publish update announcement
         shell: bash
         run: |
