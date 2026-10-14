@@ -61,11 +61,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Publish EAS Update
-        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --non-interactive'
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
       - name: Publish update announcement
         shell: bash
         run: |
@@ -88,3 +83,9 @@ jobs:
           git add update-info.json
           git commit -m "Update release announcement"
           git push --force origin update-status
+
+      - name: Publish EAS Update
+        run: npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CI: "1"
