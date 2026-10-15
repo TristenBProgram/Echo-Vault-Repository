@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LibraryProvider } from '../context/LibraryContext';
 import { PlayerProvider } from '../context/PlayerContext';
 import { colors } from '../theme';
+import { UpdateAnnouncement } from '../components/UpdateAnnouncement';
 
 const theme = {
   ...DarkTheme,
@@ -28,6 +29,7 @@ export default function RootLayout() {
             <Stack.Screen name="artist/[name]" />
             <Stack.Screen name="player" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
           </Stack>
+          <UpdateAnnouncement />
         </PlayerProvider>
       </LibraryProvider>
     </ThemeProvider>
