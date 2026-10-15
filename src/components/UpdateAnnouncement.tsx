@@ -89,8 +89,7 @@ export function UpdateAnnouncement() {
 
         <Text style={styles.note}>
           Reopen the latest Expo Go development session
-          to see the code changes. This announcement
-          does not install the EAS Update.
+          to see the code changes and install the EAS update.
         </Text>
       </View>
 
