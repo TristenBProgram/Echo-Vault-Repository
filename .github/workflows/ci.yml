@@ -62,7 +62,7 @@ jobs:
         run: npm ci
 
       - name: Publish EAS Update
-        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios'
+        run: 'npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios --platform android  
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           CI: "1"
