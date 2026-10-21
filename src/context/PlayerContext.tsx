@@ -120,30 +120,31 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const load = useCallback(
-    (track: Track, autoplay = true) => {
-      // If the full audio session was refused at startup, ask again now
-      // that the person has actually pressed play.
-      if (!fullSessionRef.current) {
-        configureAudioSession().then(ok => {
-          fullSessionRef.current = ok;
-        });
-      }
-      player.replace({ uri: track.uri, name: track.title });
-      // Carry the chosen volume over to the new song.
-      player.volume = volumeRef.current;
-      player.muted = mutedRef.current;
-      if (autoplay) startPlayback();
-      try {
-        // Lock screen / notification controls. Needs a development build
-        // to show up; harmless in Expo Go.
-        player.setActiveForLockScreen(true, { title: track.title, artist: track.artist });
-      } catch (e) {
-        console.warn('Lock screen controls unavailable', e);
-      }
-      markPlayed(track.id);
-    },
-    [player, markPlayed, startPlayback],
-  );
+  async (track: Track, autoplay = true) => {
+    const ok = await configureAudioSession();
+    fullSessionRef.current = ok;
+
+    player.replace({ uri: track.uri, name: track.title });
+    player.volume = volumeRef.current;
+    player.muted = mutedRef.current;
+
+    try {
+      player.setActiveForLockScreen(true, {
+        title: track.title,
+        artist: track.artist,
+      });
+    } catch (e) {
+      console.warn('Lock screen controls unavailable', e);
+    }
+
+    markPlayed(track.id);
+
+    if (autoplay) {
+      startPlayback();
+    }
+  },
+  [player, markPlayed, startPlayback],
+);
 
   const playTracks = useCallback<PlayerContextValue['playTracks']>(
     (tracks, startIndex = 0, opts) => {
