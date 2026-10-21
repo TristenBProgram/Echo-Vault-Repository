@@ -3,14 +3,17 @@ name: EchoVault CI
 on:
   push:
     branches:
+      - ci-cd-setup
       - music-player
+      - main
   pull_request:
     branches:
       - music-player
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   checks:
@@ -38,3 +41,53 @@ jobs:
 
       - name: Run lint
         run: npm run lint
+
+  deploy:
+    name: Publish Expo update
+    needs: checks
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/ci-cd-setup' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/music-player')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish EAS Update
+        run: | 
+          npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform ios
+          npx eas-cli@latest update --branch production --message "GitHub Actions deployment: ${{ github.sha }}" --platform android
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CI: "1"
+
+      - name: Publish update announcement
+        shell: bash
+        run: |
+          git fetch origin update-status || true
+
+          git checkout --orphan update-status
+          git rm -rf . || true
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          cat > update-info.json <<EOF
+          {
+            "releaseId": "${GITHUB_SHA}",
+            "message": "A new Echo Vault release has been published.",
+            "publishedAt": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+
+          git add update-info.json
+          git commit -m "Update release announcement"
+          git push --force origin update-status
