@@ -181,6 +181,34 @@ Everything else, including importing music, browsing the library, and all playba
 - **"Cannot find native module" errors:** Run `npx expo install --fix`, and update Expo Go on your phone.
 - **Audio won't start:** Close other apps that are playing sound, then tap play again.
 
+## Continuous Integration and Automatic Updates
+
+Pushes to `main` are tested and published automatically, so testers get new changes without pulling the code or reinstalling the app. This is handled by the GitHub Actions workflow in `.github/workflows/ci.yml` and [EAS Update](https://docs.expo.dev/eas-update/introduction/).
+
+### How It Works
+
+1. **Checks:** On every push or pull request to `main` (and `music-player`), the workflow runs the unit tests, the TypeScript check, and lint.
+2. **Publish:** If the checks pass on a push, the workflow publishes an over-the-air update to the EAS `production` branch for iOS and Android.
+3. **Receive:** Devices running a build with the `production` channel download the update in the background on launch and apply it the next time the app restarts. Close and reopen the app once or twice to see the change.
+4. **Announce:** The workflow also updates the `update-status` branch, which the in-app update announcement reads to tell users a new release is available.
+
+### Getting Updates on Your Device
+
+Updates only reach a development, preview, or production **build** of the app, not Expo Go. Install a build once, and every later push to `main` reaches it automatically:
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest build --profile production
+```
+
+Build channels are set in `eas.json`. The automatic updates are published to the `production` branch, so use a build whose profile is on the `production` channel.
+
+### Limits
+
+- Updates only change JavaScript and assets. Adding a native module or changing native config in `app.json` requires a new build.
+- An update only reaches builds with a matching runtime version. The runtime version follows the `version` field in `app.json`, so bumping `version` starts a new update line.
+- Publishing requires an `EXPO_TOKEN` repository secret (create a token at [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens) and add it under **Settings → Secrets and variables → Actions**).
+
 ## Project Status
 
 EchoVault is currently in active development as part of **CS 3203 – Software Engineering, Fall 2026**.
