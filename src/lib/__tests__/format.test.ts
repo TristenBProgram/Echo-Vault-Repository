@@ -106,13 +106,13 @@ describe('greeting', () => {
   it('matches the time of day', () => {
     expect(at(3)).toBe('Up late');
     expect(at(8)).toBe('Good morning');
-    expect(at(14)).toBe('G-ood afternoon');
+    expect(at(14)).toBe('G-ood Afternoon');
     expect(at(20)).toBe('Good evening');
   });
 
   it('switches at the boundaries', () => {
     expect(at(5)).toBe('Good morning');
-    expect(at(12)).toBe('G-ood afternoon');
+    expect(at(12)).toBe('G-ood Afternoon');
     expect(at(18)).toBe('Good evening');
   });
 });
