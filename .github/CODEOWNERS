@@ -1,0 +1,4 @@
+# The repo owner must approve every pull request before it can merge.
+# This only takes effect once branch protection on main has
+# "Require review from Code Owners" turned on.
+* @TristenBProgram
