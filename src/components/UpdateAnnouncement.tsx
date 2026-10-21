@@ -88,8 +88,7 @@ export function UpdateAnnouncement() {
         </Text>
 
         <Text style={styles.note}>
-          Reopen the latest Expo Go development session
-          to see the code changes and install the EAS update.
+          Reload your expo go sesssion and the new code changes will be avalible.
         </Text>
       </View>
 
