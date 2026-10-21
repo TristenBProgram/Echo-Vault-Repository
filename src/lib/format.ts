@@ -55,6 +55,6 @@ export function greeting(date = new Date()): string {
   const h = date.getHours();
   if (h < 5) return 'Up late';
   if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
+  if (h < 18) return 'G- ood afternoon?';
   return 'Good evening';
 }
