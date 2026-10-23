@@ -330,7 +330,7 @@ git rebase origin/main</code></pre>
   // Same time-of-day logic as greeting() in the app (src/lib/format.ts).
   (function () {
     var h = new Date().getHours();
-    var text = h < 5 ? 'Up Late?' : h < 12 ? 'Good day' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+    var text = h < 5 ? 'Up Late?' : h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
     document.getElementById('greeting').textContent = text;
   })();
 </script>
