@@ -152,6 +152,8 @@ export default function LibraryScreen() {
 
   const lib = useLibrary();
 
+  const { getTracksForPlaylist } = lib;
+
   const { playTracks } = usePlayer();
 
 
@@ -354,7 +356,7 @@ export default function LibraryScreen() {
 
     return selectedPlaylistId
 
-      ? lib.getTracksForPlaylist(selectedPlaylistId)
+      ? getTracksForPlaylist(selectedPlaylistId)
 
       : [];
 
@@ -362,9 +364,7 @@ export default function LibraryScreen() {
 
     selectedPlaylistId,
 
-    lib.playlists,
-
-    lib.tracks,
+    getTracksForPlaylist,
 
   ]);
 
