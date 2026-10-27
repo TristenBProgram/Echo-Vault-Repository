@@ -16,8 +16,8 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+          tabBarIcon: ({ size, focused }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={focused ? colors.text : colors.textFaint} />
           ),
         }}
       />
@@ -25,8 +25,8 @@ export default function TabsLayout() {
         name="library"
         options={{
           title: 'Library',
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? 'library' : 'library-outline'} size={size} color={color} />
+          tabBarIcon: ({ size, focused }) => (
+            <Ionicons name={focused ? 'library' : 'library-outline'} size={size} color={focused ? colors.text : colors.textFaint} />
           ),
         }}
       />

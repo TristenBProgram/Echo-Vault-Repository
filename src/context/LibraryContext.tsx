@@ -11,6 +11,7 @@ import { Platform } from 'react-native';
 import type { Track } from '../types';
 import { deleteImportedFile, importFromFiles, scanDevice } from '../lib/scanner';
 import { loadSavedState, saveState } from '../lib/storage';
+import { recommendTracks, type Recommendation } from '../lib/recommendations';
 import {
   addRecent,
   groupArtists,
@@ -27,6 +28,7 @@ type LibraryContextValue = {
   artists: Artist[];
   recentlyAdded: Track[];
   recentlyPlayed: Track[];
+  recommendations: Recommendation[];
   ready: boolean;
   scanning: boolean;
   /** Human-readable message from the last scan, if something went wrong. */
@@ -123,12 +125,15 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const recommendations = useMemo(() => recommendTracks(tracks, recentIds), [tracks, recentIds]);
+
   const value = useMemo<LibraryContextValue>(() => {
     return {
       tracks,
       artists: groupArtists(tracks),
       recentlyAdded: recentlyAdded(tracks),
       recentlyPlayed: resolveRecent(recentIds, tracks),
+      recommendations,
       ready,
       scanning,
       notice,
@@ -139,7 +144,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       markPlayed,
       setDuration,
     };
-  }, [tracks, recentIds, ready, scanning, notice, scan, importFiles, removeTrack, markPlayed, setDuration]);
+  }, [tracks, recentIds, recommendations, ready, scanning, notice, scan, importFiles, removeTrack, markPlayed, setDuration]);
 
   return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>;
 }

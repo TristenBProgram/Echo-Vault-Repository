@@ -29,7 +29,7 @@ export function saveState(state: SavedState) {
   try {
     const file = libraryFile();
     if (!file.exists) file.create();
-    file.write(JSON.stringify(state));
+    file.writeSync(JSON.stringify(state));
   } catch (e) {
     console.warn('Could not save library', e);
   }
