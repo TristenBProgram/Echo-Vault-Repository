@@ -1,12 +1,14 @@
 
 import { File, Paths } from 'expo-file-system';
 import type { Playlist, Track } from '../types';
+import { normalizePreferences, type RecommendationPreferences } from './recommendations';
 
 // Data saved locally on the user's phone
 export type SavedState = {
   tracks: Track[];
   recentIds: string[];
   playlists: Playlist[];
+  recommendationPreferences?: RecommendationPreferences;
 };
 
 // Location of the saved music library
@@ -24,6 +26,7 @@ export async function loadSavedState(): Promise<SavedState | null> {
     const parsed = JSON.parse(await file.text());
 
     return {
+      recommendationPreferences: normalizePreferences(parsed.recommendationPreferences),
       tracks: Array.isArray(parsed.tracks)
         ? parsed.tracks
         : [],

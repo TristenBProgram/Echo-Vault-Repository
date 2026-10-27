@@ -162,6 +162,16 @@ The mix contains up to 20 downloaded songs. It favors artists in your recent lis
 
 Recommendations update as you play, import, remove, or rescan music. They use the listening history already saved on your device, so they work after restarting the app and without an internet connection. No account, API key, or additional service is required. Artist matching uses the available file metadata; unknown artists are not treated as related.
 
+Inside **For you**, choose a listening mode:
+
+- **For you:** balances recent artist interest, explicit likes, and variety.
+- **Discover:** only includes downloads outside your last 20 distinct listens. This explores your own library, not an online catalog.
+- **Liked songs:** builds a mix from songs you have liked.
+
+Tap the **heart** under a recommendation to like or unlike it. Likes also increase interest in other songs by that artist. Tap the **eye-off** icon to hide a song from every recommendation mode. **Hidden songs → Restore** makes it eligible again. Feedback is saved locally across restarts; hiding a song never deletes the file or changes the queue already playing.
+
+Tap **New mix** to rerank recommendations and start with a different song when at least two are available. **Play mix** starts the displayed mix; it stays in the playback queue while you browse other modes or update feedback. All modes show up to 20 songs.
+
 ### Useful Commands
 
 | Command | What it does |

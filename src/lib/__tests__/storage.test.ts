@@ -27,7 +27,10 @@ it('loads pre-organizer libraries without losing recommendation history', async 
   const tracks = [makeTrack({ id: 'played' }), makeTrack({ id: 'next' })];
   mockFile.text.mockResolvedValue(JSON.stringify({ tracks, recentIds: ['played'] }));
   const saved = await loadSavedState();
-  expect(saved).toEqual({ tracks, recentIds: ['played'], playlists: [] });
+  expect(saved).toEqual({
+    tracks, recentIds: ['played'], playlists: [],
+    recommendationPreferences: { likedIds: [], hiddenIds: [] },
+  });
   expect(recommendTracks(saved!.tracks, saved!.recentIds)[0].track.id).toBe('next');
 });
 
@@ -35,6 +38,7 @@ it('preserves playlists and recommendation history together across saving and lo
   const state: SavedState = {
     tracks: [makeTrack({ id: 'played' }), makeTrack({ id: 'next' })],
     recentIds: ['played'],
+    recommendationPreferences: { likedIds: ['next'], hiddenIds: ['played'] },
     playlists: [{
       id: 'playlist', name: 'Favorites', category: 'Favorites',
       trackIds: ['next', 'played'], createdAt: 1, updatedAt: 2,
@@ -46,6 +50,8 @@ it('preserves playlists and recommendation history together across saving and lo
   expect(getPlaylistTracks(saved!.playlists[0], saved!.tracks).map(t => t.id))
     .toEqual(['next', 'played']);
   expect(recommendTracks(saved!.tracks, saved!.recentIds)[0].track.id).toBe('next');
+  expect(recommendTracks(saved!.tracks, saved!.recentIds, 20, { preferences: saved!.recommendationPreferences })
+    .map(pick => pick.track.id)).toEqual(['next']);
 });
 
 it('loads removed playlist songs safely while retaining valid recommendations', async () => {

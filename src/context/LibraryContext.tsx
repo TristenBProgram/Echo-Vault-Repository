@@ -11,7 +11,10 @@ import React, {
 import { Platform } from 'react-native';
 import { deleteImportedFile, importFromFiles, scanDevice } from '../lib/scanner';
 import { loadSavedState, saveState } from '../lib/storage';
-import { recommendTracks, type Recommendation } from '../lib/recommendations';
+import {
+  recommendTracks, normalizePreferences, updateRecommendationFeedback,
+  type Recommendation, type RecommendationOptions, type RecommendationPreferences,
+} from '../lib/recommendations';
 import {
   addRecent,
   groupArtists,
@@ -39,6 +42,9 @@ type LibraryContextValue = {
   recentlyAdded: Track[];
   recentlyPlayed: Track[];
   recommendations: Recommendation[];
+  recommendationPreferences: RecommendationPreferences;
+  getRecommendations: (options?: RecommendationOptions) => Recommendation[];
+  recommendationFeedback: (id: string, action: 'like' | 'hide' | 'restore') => void;
   ready: boolean;
   scanning: boolean;
   /** Human-readable message from the last scan, if something went wrong. */
@@ -77,6 +83,9 @@ const LibraryContext = createContext<LibraryContextValue | null>(null);
 export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [recentIds, setRecentIds] = useState<string[]>([]);
+  const [recommendationPreferences, setRecommendationPreferences] = useState<RecommendationPreferences>(
+    () => normalizePreferences(null),
+  );
   const [ready, setReady] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -94,6 +103,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
         setTracks(saved.tracks);
         setRecentIds(saved.recentIds);
         setPlaylists(saved.playlists);
+        setRecommendationPreferences(normalizePreferences(saved.recommendationPreferences));
       }
       loaded.current = true;
       setReady(true);
@@ -106,8 +116,8 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
 
   // Save whenever the library or playlists change.
   useEffect(() => {
-    if (loaded.current) saveState({ tracks, recentIds, playlists });
-  }, [tracks, recentIds, playlists]);
+    if (loaded.current) saveState({ tracks, recentIds, playlists, recommendationPreferences });
+  }, [tracks, recentIds, playlists, recommendationPreferences]);
 
   const runScan = useCallback(async (showNotice: boolean) => {
     setScanning(true);
@@ -148,6 +158,10 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       return prev.filter(x => x.id !== id);
     });
     setRecentIds(prev => prev.filter(x => x !== id));
+    setRecommendationPreferences(prev => ({
+      likedIds: prev.likedIds.filter(value => value !== id),
+      hiddenIds: prev.hiddenIds.filter(value => value !== id),
+    }));
   }, []);
 
   const markPlayed = useCallback((id: string) => {
@@ -160,7 +174,14 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const recommendations = useMemo(() => recommendTracks(tracks, recentIds), [tracks, recentIds]);
+  const getRecommendations = useCallback((options: RecommendationOptions = {}) =>
+    recommendTracks(tracks, recentIds, 20, { ...options, preferences: recommendationPreferences }),
+  [tracks, recentIds, recommendationPreferences]);
+  const recommendations = useMemo(() => getRecommendations(), [getRecommendations]);
+  const recommendationFeedback = useCallback((id: string, action: 'like' | 'hide' | 'restore') => {
+    if (!tracks.some(track => track.id === id)) return;
+    setRecommendationPreferences(prev => updateRecommendationFeedback(prev, id, action));
+  }, [tracks]);
 
   // Create a new playlist
   const createNewPlaylist = useCallback((
@@ -238,6 +259,9 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       recentlyAdded: recentlyAdded(tracks),
       recentlyPlayed: resolveRecent(recentIds, tracks),
       recommendations,
+      recommendationPreferences,
+      getRecommendations,
+      recommendationFeedback,
       ready,
       scanning,
       notice,
@@ -261,6 +285,9 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     tracks,
     recentIds,
     recommendations,
+    recommendationPreferences,
+    getRecommendations,
+    recommendationFeedback,
     ready,
     scanning,
     notice,
