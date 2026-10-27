@@ -268,6 +268,22 @@ Tap **New mix** to rerank recommendations and start with a different song when a
 
 ### Useful Commands
 
+To test music recommendations specifically, run:
+
+```bash
+npm run test:recommendations
+```
+
+On a computer with unsupported system Node (such as Node 25), use:
+
+```bash
+npm exec --yes --package=node@22 -- npm run test:recommendations
+```
+
+The `TestMusicRecommendation` suite in `src/test/musicRecommendation.test.tsx` uses a fresh library provider and four controlled songs for each test. It tests the actual TypeScript recommender through `useLibrary().getRecommendations()`, with storage, imports, and device scanning mocked. Preferences are liked/hidden track IDs; songs use the production `Track` structure. There is no Python `RecommendationManager` or genre field in this app.
+
+The suite checks valid, empty, missing, malformed, and unknown preferences; one, multiple, and no matching songs; duplicate IDs; and empty libraries. Empty preferences still produce a personal mix from downloads, while **Liked songs** returns an empty list. Unknown track IDs are tested in place of unsupported genres. Additional checks verify live updates after listening, feedback, imports, removal, and reopening. Assertions compare actual song objects and recommendation reasons. The command also runs the ranking and persistence unit tests.
+
 | Command | What it does |
 |---|---|
 | `npm start` | Start the SDK 58 app for Expo Go |
