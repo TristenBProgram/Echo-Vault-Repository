@@ -14,3 +14,28 @@ export type Track = {
 };
 
 export type RepeatMode = 'off' | 'all' | 'one';
+
+
+export type PlaylistCategory =
+  | 'Workout'
+  | 'Study'
+  | 'Driving'
+  | 'Chill'
+  | 'Party'
+  | 'Sleep'
+  | 'Hip-Hop'
+  | 'R&B'
+  | 'Pop'
+  | 'Country'
+  | 'Rock'
+  | 'Favorites'
+  | 'Custom';
+
+export type Playlist = {
+  id: string;
+  name: string;
+  category: PlaylistCategory;
+  trackIds: string[];
+  createdAt: number;
+  updatedAt: number;
+};

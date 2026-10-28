@@ -58,6 +58,20 @@ export default function HomeScreen() {
 
         {lib.notice && <Text style={styles.notice}>{lib.notice}</Text>}
 
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="For you, music recommendations"
+          onPress={() => router.push('/recommendations')}
+          style={({ pressed }) => [styles.recommendations, pressed && { opacity: 0.8 }]}
+        >
+          <Ionicons name="sparkles" size={26} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.secondaryText}>For you</Text>
+            <Text style={styles.recommendationsBody}>A personal mix from your downloaded music</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.textDim} />
+        </Pressable>
+
         <Shelf
           title="Jump back in"
           items={lib.recentlyPlayed.slice(0, 10).map((t, i, list) => ({
@@ -171,6 +185,12 @@ const styles = StyleSheet.create({
   secondaryText: { color: colors.text, fontSize: 15, fontWeight: '600' },
   wide: { alignSelf: 'stretch', marginTop: spacing.md },
   notice: { color: colors.textDim, fontSize: 13, paddingHorizontal: spacing.lg, marginTop: spacing.md },
+  recommendations: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    backgroundColor: colors.surfaceHigh, borderRadius: 16,
+    padding: spacing.lg, marginHorizontal: spacing.lg, marginTop: spacing.xl,
+  },
+  recommendationsBody: { color: colors.textDim, fontSize: 13, marginTop: spacing.xs },
   emptyIcon: {
     width: 96,
     height: 96,

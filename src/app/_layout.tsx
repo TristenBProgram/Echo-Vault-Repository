@@ -27,6 +27,7 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="artist/[name]" />
+            <Stack.Screen name="recommendations" />
             <Stack.Screen name="player" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
           </Stack>
           <UpdateAnnouncement />

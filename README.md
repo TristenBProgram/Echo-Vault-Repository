@@ -12,6 +12,7 @@ The goal of EchoVault is to make downloaded music easy to organize, browse, and 
 - Organize songs in a clean music library
 - Display available song, artist, album, and artwork information
 - Play downloaded music without internet access
+- Get offline music recommendations from your downloaded library
 - Provide play, pause, resume, and stop controls
 - Create and manage custom playlists
 - Keep playlist data after the application is closed and reopened
@@ -87,11 +88,11 @@ EchoVault is built with React Native and Expo. **The current way to test and use
 
 ### What You Need
 
-- A computer with **Git** and **Node.js (LTS version)** installed
+- A computer with **Git** and **Node.js 22.13+ (22 LTS) or 24.3+ (24 LTS)** installed
   - Check with `git --version` and `node -v` in a terminal
-  - Node.js can be installed from [nodejs.org](https://nodejs.org), or on a Mac with nvm: `nvm install --lts`
+  - Node.js can be installed from [nodejs.org](https://nodejs.org), or with nvm: `nvm install` followed by `nvm use` in the repository (uses `.nvmrc`). Node 25 is unsupported by SDK 58.
 - A phone with the **Expo Go** app installed from the [App Store](https://apps.apple.com/app/expo-go/id982107779) or [Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
-  - Keep Expo Go updated. It must support the same Expo SDK version as the project.
+  - Keep Expo Go updated. This project uses **Expo SDK 58**.
 - Your phone and computer on the **same Wi-Fi network**
 
 ### 1. Get the Code
@@ -118,10 +119,10 @@ Run this again after pulling changes that modify `package.json`.
 ### 3. Start the Development Server
 
 ```bash
-npx expo start
+npm start
 ```
 
-A QR code appears in the terminal. Leave this terminal running while you use the app.
+A QR code appears in the terminal. `npm start` selects Expo Go explicitly (`expo start --go`). Leave this terminal running while you use the app.
 
 ### 4. Open EchoVault on Your Phone
 
@@ -153,13 +154,31 @@ Tip: rename files to `Artist - Title.mp3` before adding them so they display nic
 
 Song titles and artists are read from file names, so files named like `Artist - Title.mp3` display best.
 
+### Music Recommendations
+
+Once you have added music, tap **For you** on Home, below the playback and import buttons. Tap a song to start from that pick, or **Play mix** to play the recommendations in order.
+
+The mix contains up to 20 downloaded songs. It favors artists in your recent listening, gives songs outside your recent rotation a boost, and spreads picks across artists. Each song includes a short explanation. With no listening history, the mix starts with recent downloads and a variety of artists.
+
+Recommendations update as you play, import, remove, or rescan music. They use the listening history already saved on your device, so they work after restarting the app and without an internet connection. No account, API key, or additional service is required. Artist matching uses the available file metadata; unknown artists are not treated as related.
+
+Inside **For you**, choose a listening mode:
+
+- **For you:** balances recent artist interest, explicit likes, and variety.
+- **Discover:** only includes downloads outside your last 20 distinct listens. This explores your own library, not an online catalog.
+- **Liked songs:** builds a mix from songs you have liked.
+
+Tap the **heart** under a recommendation to like or unlike it. Likes also increase interest in other songs by that artist. Tap the **eye-off** icon to hide a song from every recommendation mode. **Hidden songs → Restore** makes it eligible again. Feedback is saved locally across restarts; hiding a song never deletes the file or changes the queue already playing.
+
+Tap **New mix** to rerank recommendations and start with a different song when at least two are available. **Play mix** starts the displayed mix; it stays in the playback queue while you browse other modes or update feedback. All modes show up to 20 songs.
+
 ### Useful Commands
 
 | Command | What it does |
 |---|---|
-| `npx expo start` | Start the app for Expo Go |
-| `npx expo start -c` | Start with a cleared cache (try this first if something looks out of date) |
-| `npx expo start --tunnel` | Use when your phone can't connect over Wi-Fi |
+| `npm start` | Start the SDK 58 app for Expo Go |
+| `npm start -- --clear` | Start with a cleared cache (try this first if something looks out of date) |
+| `npm start -- --tunnel` | Use when your phone can't connect over Wi-Fi |
 | `npm test` | Run the unit tests |
 | Shake phone | Open the Expo developer menu (reload, debugging tools) |
 
@@ -175,9 +194,10 @@ Everything else, including importing music, browsing the library, and all playba
 
 ### Troubleshooting
 
-- **Phone can't connect or keeps loading:** Make sure the phone and computer are on the same Wi-Fi, or run `npx expo start --tunnel`.
-- **You see "Welcome to Expo" instead of EchoVault:** Leftover template screens are taking priority. `src/app` should contain only `(tabs)`, `artist`, `_layout.tsx` and `player.tsx`.
-- **Red error screen after pulling changes:** Run `npm install`, then `npx expo start -c`.
+- **Phone can't connect or keeps loading:** Make sure the phone and computer are on the same Wi-Fi, or run `npm start -- --tunnel`.
+- **"No usable data found" when scanning:** Install Expo Go, stop any old dev server with Ctrl+C, and run `npm start` so the QR code targets Expo Go. Use the Camera app on iPhone or the scanner inside Expo Go on Android.
+- **You see "Welcome to Expo" instead of EchoVault:** Leftover template screens are taking priority. `src/app` should contain only `(tabs)`, `artist`, `_layout.tsx`, `player.tsx`, and `recommendations.tsx`.
+- **Red error screen after pulling changes:** Run `npm install`, then `npm start -- --clear`.
 - **"Cannot find native module" errors:** Run `npx expo install --fix`, and update Expo Go on your phone.
 - **Audio won't start:** Close other apps that are playing sound, then tap play again.
 

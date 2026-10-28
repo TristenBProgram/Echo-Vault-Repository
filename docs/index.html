@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EchoVault – Local music? Modern experience.</title>
+<meta name="description" content="EchoVault is a local-first music player: a streaming-style experience for the music you own, with no subscription or internet connection required.">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --border: #2a2f3d;
+    --text: #e8eaf0;
+    --muted: #9aa1b2;
+    --accent: #7c8cff;
+    --code-bg: #0b0d12;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --border: #dfe2ec;
+      --text: #1a1d27;
+      --muted: #5b6275;
+      --accent: #4254e0;
+      --code-bg: #eef0f7;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+  header.hero { padding: 64px 0 40px; border-bottom: 1px solid var(--border); }
+  #greeting {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .02em;
+  }
+  h1 { margin: 0; font-size: clamp(2.4rem, 8vw, 3.6rem); line-height: 1.1; }
+  .tagline { margin: 12px 0 0; font-size: 1.25rem; font-weight: 600; }
+  .lead { margin: 16px 0 0; color: var(--muted); }
+  .cta { display: inline-block; margin-top: 24px; padding: 10px 18px; border-radius: 8px;
+    background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; }
+  main { padding: 16px 0 64px; }
+  h2 { margin: 48px 0 12px; font-size: 1.6rem; padding-top: 8px; border-top: 1px solid var(--border); }
+  h2:first-child { border-top: 0; }
+  h3 { margin: 28px 0 8px; font-size: 1.15rem; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: 4px 0; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font: .9em ui-monospace, Menlo, Consolas, monospace; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface); }
+  .story { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 16px 12px; margin: 12px 0; }
+  .story h3 { margin-top: 12px; }
+  .story p { margin: 6px 0 0; color: var(--muted); }
+  footer { border-top: 1px solid var(--border); padding: 24px 0 48px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p id="greeting">g o o d a f t e r n o o n</p>
+    <h1>EchoVault</h1>
+    <p class="tagline">Local music? Modern experience.</p>
+    <p class="lead">EchoVault is a local-first playback application built for people who want the convenience of a modern streaming-style music player while keeping full ownership of the music stored on their device.</p>
+    <a class="cta" href="https://github.com/TristenBProgram/Echo-Vault-Repository">View on GitHub</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<p>The goal of EchoVault is to make downloaded music easy to organize, browse, and play without requiring a subscription or an internet connection.</p>
+
+<h2>Features</h2>
+<ul>
+  <li>Scan supported audio files stored on the user's device</li>
+  <li>Organize songs in a clean music library</li>
+  <li>Display available song, artist, album, and artwork information</li>
+  <li>Play downloaded music without internet access</li>
+  <li>Provide play, pause, resume, and stop controls</li>
+  <li>Create and manage custom playlists</li>
+  <li>Keep playlist data after the application is closed and reopened</li>
+  <li>Handle missing metadata and playback errors safely</li>
+  <li>Add structured logs for important events, warnings, and errors</li>
+</ul>
+
+<h2>Who EchoVault Is For</h2>
+<p>EchoVault is designed for:</p>
+<ul>
+  <li>Listeners who own downloaded music</li>
+  <li>Audiophiles who use formats such as FLAC and WAV</li>
+  <li>DJs and independent artists</li>
+  <li>Users who want to avoid recurring music subscriptions</li>
+  <li>Users who may have limited or unreliable internet access</li>
+</ul>
+
+<h2>Product Vision</h2>
+<p>EchoVault combines a modern listening experience with three main goals:</p>
+<ol>
+  <li><strong>Modern UX</strong> – A clean, streaming-style interface for browsing and playing music.</li>
+  <li><strong>True Ownership</strong> – The user's music stays on their device and remains under their control.</li>
+  <li><strong>Offline Freedom</strong> – Music can be played without depending on an internet connection.</li>
+</ol>
+
+<h2>Planned User Stories</h2>
+<div class="story"><h3>Local Music Discovery</h3><p>As a listener, I want EchoVault to scan my local music folder so that I do not have to import every song manually.</p></div>
+<div class="story"><h3>Organized Music Library</h3><p>As a user, I want my downloaded music displayed in an organized library so that I can quickly find a track.</p></div>
+<div class="story"><h3>Offline Playback</h3><p>As a traveler or offline listener, I want to play downloaded music without internet access so that I can listen anywhere.</p></div>
+<div class="story"><h3>Playlist Management</h3><p>As a listener, I want to create playlists from local tracks so that I can organize music for different activities.</p></div>
+<div class="story"><h3>Metadata and Artwork</h3><p>As a listener, I want useful track metadata and album art so that my local library feels like a modern streaming application.</p></div>
+
+<h2>Current Development Plan</h2>
+<h3>Sprint 1</h3>
+<ul>
+  <li>Set up the project structure and implementation approach</li>
+  <li>Build the basic library screen and user interface</li>
+  <li>Implement local audio-folder scanning</li>
+  <li>Add playback controls and playback states</li>
+  <li>Implement offline playback</li>
+  <li>Implement playlist creation, adding, removing, and saving</li>
+  <li>Run integration and acceptance testing</li>
+</ul>
+<h3>Future Sprints</h3>
+<ul>
+  <li>Add metadata and album artwork support</li>
+  <li>Create a structured logging system</li>
+  <li>Log scan, playback, and playlist events and errors</li>
+  <li>Add diagnostic-log export and privacy checks</li>
+  <li>Run end-to-end user acceptance testing</li>
+  <li>Collect user feedback and improve the product backlog</li>
+  <li>Fix critical and high-priority defects</li>
+  <li>Complete release planning, Sprint Review, and retrospective</li>
+</ul>
+
+<h2 id="expo-go">Running the App with Expo Go</h2>
+<p>EchoVault is built with React Native and Expo. <strong>The current way to test and use the app is Expo Go</strong>, a free app that runs EchoVault on your own phone straight from your computer, with no App Store install or Xcode build needed.</p>
+
+<h3>What You Need</h3>
+<ul>
+  <li>A computer with <strong>Git</strong> and <strong>Node.js (LTS version)</strong> installed
+    <ul>
+      <li>Check with <code>git --version</code> and <code>node -v</code> in a terminal</li>
+      <li>Node.js can be installed from <a href="https://nodejs.org">nodejs.org</a>, or on a Mac with nvm: <code>nvm install --lts</code></li>
+    </ul>
+  </li>
+  <li>A phone with the <strong>Expo Go</strong> app installed from the <a href="https://apps.apple.com/app/expo-go/id982107779">App Store</a> or <a href="https://play.google.com/store/apps/details?id=host.exp.exponent">Google Play</a>
+    <ul><li>Keep Expo Go updated. It must support the same Expo SDK version as the project.</li></ul>
+  </li>
+  <li>Your phone and computer on the <strong>same Wi-Fi network</strong></li>
+</ul>
+
+<h3>1. Get the Code</h3>
+<pre><code>git clone https://github.com/TristenBProgram/Echo-Vault-Repository.git
+cd Echo-Vault-Repository</code></pre>
+<p>To test a feature branch, switch to it after cloning:</p>
+<pre><code>git checkout feature-branch-name</code></pre>
+
+<h3>2. Install Dependencies</h3>
+<pre><code>npm install</code></pre>
+<p>Run this again after pulling changes that modify <code>package.json</code>.</p>
+
+<h3>3. Start the Development Server</h3>
+<pre><code>npx expo start</code></pre>
+<p>A QR code appears in the terminal. Leave this terminal running while you use the app.</p>
+
+<h3>4. Open EchoVault on Your Phone</h3>
+<ul>
+  <li><strong>iPhone:</strong> Open the Camera app, point it at the QR code, and tap the banner that appears.</li>
+  <li><strong>Android:</strong> Open Expo Go and tap <strong>Scan QR code</strong>.</li>
+</ul>
+<p>EchoVault loads in Expo Go. When you save a code change on your computer, the app reloads on your phone automatically.</p>
+
+<h3>Getting Music to Test With</h3>
+<p>You need a few audio files (MP3, M4A, WAV, FLAC) on your phone. Good free, legal sources:</p>
+<ul>
+  <li><a href="https://studio.youtube.com/channel/UC/music"><strong>YouTube Audio Library</strong></a>: free music YouTube provides for download as MP3s (sign in, then <strong>Audio Library</strong> in YouTube Studio)</li>
+  <li><a href="https://pixabay.com/music/"><strong>Pixabay Music</strong></a> and <a href="https://freemusicarchive.org/"><strong>Free Music Archive</strong></a>: free tracks, many with no account needed</li>
+  <li><strong>Music you already own</strong>, such as Bandcamp purchases, ripped CDs, or your own recordings</li>
+</ul>
+<p>To get files onto your phone:</p>
+<ul>
+  <li><strong>iPhone:</strong> Download the file in Safari (it goes to <strong>Files → Downloads</strong>), or AirDrop it from a Mac and choose <strong>Save to Files</strong>.</li>
+  <li><strong>Android:</strong> Download the file in your browser. It lands in the <strong>Downloads</strong> folder, which EchoVault can scan.</li>
+</ul>
+<p>Tip: rename files to <code>Artist - Title.mp3</code> before adding them so they display nicely.</p>
+
+<h3>5. Add Music and Play</h3>
+<ul>
+  <li><strong>iPhone:</strong> Tap <strong>Add from Files</strong> and pick audio files from the Files app (iCloud Drive, Downloads, AirDrop). iOS does not allow apps to scan the whole device, so music is imported this way, and the app keeps its own copy.</li>
+  <li><strong>Android:</strong> Tap <strong>Scan my phone</strong> and allow access to music and audio. If no permission prompt appears in Expo Go, use <strong>Add from Files</strong> instead (see limitations below).</li>
+  <li>Tap any song to play it. The mini player appears at the bottom of the screen; tap it to open <strong>Now Playing</strong>, which has play/pause, a progress bar you can drag, 15-second skip buttons, volume and mute, shuffle, and repeat.</li>
+</ul>
+<p>Song titles and artists are read from file names, so files named like <code>Artist - Title.mp3</code> display best.</p>
+
+<h3>Useful Commands</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>npx expo start</code></td><td>Start the app for Expo Go</td></tr>
+    <tr><td><code>npx expo start -c</code></td><td>Start with a cleared cache (try this first if something looks out of date)</td></tr>
+    <tr><td><code>npx expo start --tunnel</code></td><td>Use when your phone can't connect over Wi-Fi</td></tr>
+    <tr><td><code>npm test</code></td><td>Run the unit tests</td></tr>
+    <tr><td>Shake phone</td><td>Open the Expo developer menu (reload, debugging tools)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Expo Go Limitations</h3>
+<p>Expo Go is the fastest way to test, but a few features only work in a full build of the app (a development build), which will be set up in a later sprint:</p>
+<ul>
+  <li><strong>Background playback:</strong> music stops when you leave the app in Expo Go</li>
+  <li><strong>Lock-screen and notification controls</strong></li>
+  <li><strong>Scanning the whole device on Android</strong> may be blocked in Expo Go</li>
+</ul>
+<p>Everything else, including importing music, browsing the library, and all playback controls, works in Expo Go.</p>
+
+<h3>Troubleshooting</h3>
+<ul>
+  <li><strong>Phone can't connect or keeps loading:</strong> Make sure the phone and computer are on the same Wi-Fi, or run <code>npx expo start --tunnel</code>.</li>
+  <li><strong>You see "Welcome to Expo" instead of EchoVault:</strong> Leftover template screens are taking priority. <code>src/app</code> should contain only <code>(tabs)</code>, <code>artist</code>, <code>_layout.tsx</code> and <code>player.tsx</code>.</li>
+  <li><strong>Red error screen after pulling changes:</strong> Run <code>npm install</code>, then <code>npx expo start -c</code>.</li>
+  <li><strong>"Cannot find native module" errors:</strong> Run <code>npx expo install --fix</code>, and update Expo Go on your phone.</li>
+  <li><strong>Audio won't start:</strong> Close other apps that are playing sound, then tap play again.</li>
+</ul>
+
+<h2>Project Status</h2>
+<p>EchoVault is currently in active development as part of <strong>CS 3203 – Software Engineering, Fall 2026</strong>.</p>
+<p>The current Scrum plan focuses on building a small, testable first version and improving it through future sprints and user feedback.</p>
+
+<h2>Team</h2>
+<p><strong>Group F</strong></p>
+<ul>
+  <li>Tristen Banaj</li>
+  <li>Abiel Berhanu</li>
+  <li>Warren Du</li>
+  <li>Cuong Huynh</li>
+  <li>William Nguyen</li>
+</ul>
+
+<h2>Contributing</h2>
+<p>For team development:</p>
+<ol>
+  <li>Create or update your assigned branch.</li>
+  <li>Make and test your changes.</li>
+  <li>Commit your work with a clear commit message.</li>
+  <li>Push your branch to GitHub.</li>
+  <li>Open a pull request for team review before merging into the <code>main</code> branch.</li>
+</ol>
+<p>Example:</p>
+<pre><code>git checkout -b feature-name
+git add .
+git commit -m "Describe the change"
+git push origin feature-name</code></pre>
+
+<h2>Branch Strategy</h2>
+<p>To prevent changes made by different team members from interfering with each other, EchoVault will use a <strong>feature-branch workflow</strong>.</p>
+<p>The <code>main</code> branch will contain the stable version of the project. Team members should create separate branches for the features or tasks they are working on instead of making major changes directly on <code>main</code>.</p>
+<p>Example branch names:</p>
+<ul>
+  <li><code>feature/music-scanner</code></li>
+  <li><code>feature/playback-controls</code></li>
+  <li><code>feature/playlists</code></li>
+  <li><code>feature/metadata</code></li>
+  <li><code>feature/logging</code></li>
+</ul>
+
+<h3>Development Workflow</h3>
+<ol>
+  <li>Update the local <code>main</code> branch.
+<pre><code>git checkout main
+git pull origin main</code></pre></li>
+  <li>Create a new branch for the assigned task.
+<pre><code>git checkout -b feature/music-scanner</code></pre></li>
+  <li>Make and test changes on the feature branch.</li>
+  <li>Commit the changes.
+<pre><code>git add .
+git commit -m "Implement local music folder scanning"</code></pre></li>
+  <li>Push the branch to GitHub.
+<pre><code>git push origin feature/music-scanner</code></pre></li>
+  <li>Create a pull request.</li>
+  <li>Have the changes reviewed before merging them into <code>main</code>.</li>
+</ol>
+
+<h3>Branching</h3>
+<p>Branching allows each team member to work on a feature separately without changing the stable version of EchoVault.</p>
+<h3>Merging</h3>
+<p>Merging combines completed changes from a feature branch into the <code>main</code> branch after the work has been reviewed and tested.</p>
+<h3>Squashing</h3>
+<p>Squashing combines several small commits into one cleaner commit. This helps keep the project's commit history organized and easier to understand.</p>
+<h3>Rebasing</h3>
+<p>Rebasing updates a feature branch with the newest changes from <code>main</code>. This can help keep the branch current and reduce conflicts before merging.</p>
+<p>Example:</p>
+<pre><code>git checkout feature/music-scanner
+git fetch origin
+git rebase origin/main</code></pre>
+<p>If a conflict occurs during the rebase, the developer resolves the conflict before continuing.</p>
+
+<h3>Why We Use This Strategy</h3>
+<p>This strategy allows multiple EchoVault developers to work at the same time while reducing conflicts, keeping the project history organized, and protecting the stable version of the application.</p>
+
+<h2>Documentation</h2>
+<p>Project documentation currently includes:</p>
+<ul>
+  <li>Ticket 1: Product Vision</li>
+  <li>Ticket 2: Scrum Plan</li>
+  <li>Ticket 3: README and Code Management Strategy</li>
+</ul>
+
+</main>
+
+<footer>
+  <div class="wrap">EchoVault · CS 3203 Group F · <a href="https://github.com/TristenBProgram/Echo-Vault-Repository">Source on GitHub</a></div>
+</footer>
+
+<script>
+  // Same time-of-day logic as greeting() in the app (src/lib/format.ts).
+  (function () {
+    var h = new Date().getHours();
+    var text = h < 5 ? 'Up Late?' : h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+    document.getElementById('greeting').textContent = text;
+  })();
+</script>
+</body>
+</html>
