@@ -56,7 +56,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
-    "test:recommendations": "jest --runInBand src/test/musicRecommendation.test.tsx src/lib/__tests__/recommendations.test.ts src/lib/__tests__/storage.test.ts"
+    "test:recommendations": "jest --runInBand src/lib/__tests__/musicRecommendation.test.tsx src/lib/__tests__/recommendations.test.ts src/lib/__tests__/storage.test.ts"
   },
   "private": true,
   "engines": {

@@ -9,15 +9,15 @@
 import React, { act } from 'react';
 import { Platform } from 'react-native';
 import { createRoot } from 'test-renderer';
-import { LibraryProvider, useLibrary } from '../context/LibraryContext';
-import { loadSavedState, saveState, type SavedState } from '../lib/storage';
-import { deleteImportedFile, importFromFiles } from '../lib/scanner';
-import type { RecommendationPreferences } from '../lib/recommendations';
-import { makeTrack } from '../lib/testUtils';
-import type { Track } from '../types';
+import { LibraryProvider, useLibrary } from '../../context/LibraryContext';
+import { loadSavedState, saveState, type SavedState } from '../storage';
+import { deleteImportedFile, importFromFiles } from '../scanner';
+import type { RecommendationPreferences } from '../recommendations';
+import { makeTrack } from '../testUtils';
+import type { Track } from '../../types';
 
-jest.mock('../lib/storage', () => ({ loadSavedState: jest.fn(), saveState: jest.fn() }));
-jest.mock('../lib/scanner', () => ({
+jest.mock('../storage', () => ({ loadSavedState: jest.fn(), saveState: jest.fn() }));
+jest.mock('../scanner', () => ({
   scanDevice: jest.fn(), importFromFiles: jest.fn(), deleteImportedFile: jest.fn(),
 }));
 
