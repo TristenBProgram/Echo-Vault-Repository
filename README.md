@@ -82,6 +82,100 @@ As a listener, I want useful track metadata and album art so that my local libra
 - Fix critical and high-priority defects
 - Complete release planning, Sprint Review, and retrospective
 
+## Reviewer Quick Start: Run the Unit Tests
+
+You do not need a phone or Expo Go to review the tests. Follow these steps in a terminal.
+
+1. **Install prerequisites.** You need [Git](https://git-scm.com) and **Node.js 22.13+ (22 LTS) or 24.3+ (24 LTS)**. Verify with:
+
+   ```bash
+   git --version
+   node -v
+   ```
+
+   If your Node version is wrong, install nvm and run `nvm install` then `nvm use` inside the repository (it reads `.nvmrc`).
+
+2. **Clone the repository and install dependencies.**
+
+   ```bash
+   git clone https://github.com/TristenBProgram/Echo-Vault-Repository.git
+   cd Echo-Vault-Repository
+   npm install
+   ```
+
+3. **Run all unit tests.**
+
+   ```bash
+   npm test
+   ```
+
+   Every suite should pass. Tests run with Jest (`jest-expo` preset) and do not need an internet connection.
+
+4. **Run only the `scanDevice` tests.**
+
+   ```bash
+   npx jest src/lib/__tests__/scanner.test.ts --verbose
+   ```
+
+   Expected: 9 passing tests.
+
+### Running These Exact Tests on Another Computer
+
+Use this if you are a classmate or reviewer starting from a fresh machine. Until the tests are merged into `main`, they live on the `feature/scan-device-tests` branch, so clone that branch directly:
+
+```bash
+git clone --branch feature/scan-device-tests https://github.com/TristenBProgram/Echo-Vault-Repository.git
+cd Echo-Vault-Repository
+npm install
+npx jest src/lib/__tests__/scanner.test.ts --verbose
+```
+
+Already cloned the repository? Switch to the branch instead:
+
+```bash
+git fetch origin
+git checkout feature/scan-device-tests
+npm install
+npx jest src/lib/__tests__/scanner.test.ts --verbose
+```
+
+Once the tests are merged, the normal `main` clone works and the same `npx jest` command runs them.
+
+You should see `Tests: 9 passed, 9 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
+
+### Where the Code and Tests Are
+
+| What | File |
+|---|---|
+| `scanDevice()` function under test | [`src/lib/scanner.ts`](src/lib/scanner.ts) |
+| `scanDevice()` unit tests | [`src/lib/__tests__/scanner.test.ts`](src/lib/__tests__/scanner.test.ts) |
+| Other unit tests | [`src/lib/__tests__/`](src/lib/__tests__/) |
+
+### What the `scanDevice` Tests Cover
+
+The Expo native modules (`expo-media-library`, `expo-file-system`, `expo-document-picker`) are mocked, so the tests run on your computer without a device.
+
+- iOS returns `unsupported` and never asks for permission
+- Denied permission returns `permission` and never queries the media store
+- Audio-only query with a 10,000 item limit and read-only permission request
+- No audio on the device returns an empty track list
+- Media rows are converted into tracks (title, artist, duration in seconds, `device` source)
+- Clips shorter than 30 seconds (ringtones) are skipped
+- A failing media query or permission request returns `error` with its message
+
+### Optional: Other Checks the CI Runs
+
+```bash
+npx tsc --noEmit   # TypeScript check
+npm run lint       # lint
+```
+
+### Test Troubleshooting
+
+- **`jest: command not found` or missing modules:** run `npm install` again from the repository root.
+- **Unsupported engine warning or odd errors:** check `node -v` against the version above.
+- **Stale results:** run `npx jest --clearCache`, then `npm test`.
+
 ## Running the App with Expo Go
 
 EchoVault is built with React Native and Expo. **The current way to test and use the app is Expo Go**, a free app that runs EchoVault on your own phone straight from your computer, with no App Store install or Xcode build needed.
