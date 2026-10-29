@@ -127,6 +127,12 @@ You do not need a phone or Expo Go to review the tests. Follow these steps in a 
 
    Expected: 17 passing tests. This test exercises the app's library provider and recommendations with mocked storage and device access. It only needs Git, Node.js, and npm; Android Studio, Xcode, Expo Go, and a phone are not required.
 
+6. **Run only the `playlistCreate` unit test.**
+
+   ```bash
+   npm test -- --runInBand test/playlistCreate.test.ts
+   ```
+
 ### Running the `scanDevice` Tests on Another Computer
 
 Clone `main` and install the project dependencies:
