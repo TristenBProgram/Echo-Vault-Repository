@@ -1,3 +1,17 @@
+/**
+ * Unit tests for scanDevice() in src/lib/scanner.ts.
+ *
+ * How to run (no phone, emulator, or Expo Go needed):
+ *   1. Requires Git and Node.js 22.13+ (22 LTS) or 24.3+ (24 LTS).
+ *   2. git clone --branch feature/scan-device-tests https://github.com/TristenBProgram/Echo-Vault-Repository.git
+ *      (once merged, a normal clone of main works)
+ *   3. cd Echo-Vault-Repository && npm install
+ *   4. npx jest src/lib/__tests__/scanner.test.ts --verbose
+ *      (or `npm test` to run every suite)
+ *
+ * Expected: 9 tests pass. The Expo native modules (expo-media-library,
+ * expo-file-system, expo-document-picker) are mocked below.
+ */
 import { Platform } from 'react-native';
 import { requestPermissionsAsync } from 'expo-media-library';
 import { scanDevice } from '../scanner';
