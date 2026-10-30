@@ -93,12 +93,12 @@ You do not need a phone or Expo Go to review the tests. Follow these steps in a 
    node -v
    ```
 
-   If your Node version is wrong, install nvm and run `nvm install` then `nvm use` inside the repository (it reads `.nvmrc`).
+   If your Node version is wrong, install nvm. After cloning, run `nvm install` and `nvm use` from the repository root (the version is read from `.nvmrc`).
 
-2. **Clone the repository and install dependencies.**
+2. **Clone the `main` branch and install dependencies.**
 
    ```bash
-   git clone https://github.com/TristenBProgram/Echo-Vault-Repository.git
+   git clone --branch main https://github.com/TristenBProgram/Echo-Vault-Repository.git
    cd Echo-Vault-Repository
    npm install
    ```
@@ -119,17 +119,32 @@ You do not need a phone or Expo Go to review the tests. Follow these steps in a 
 
    Expected: 16 passing tests.
 
-### Running These Exact Tests on Another Computer
+5. **Run only the music recommendation unit test.**
 
-Use this if you are a classmate or reviewer starting from a fresh machine. Until the tests are merged into `main`, they live on the `feature/scan-device-tests` branch, so clone that branch directly:
+   ```bash
+   npx jest --runInBand src/lib/__tests__/musicRecommendation.test.tsx
+   ```
+
+   Expected: 17 passing tests. This test exercises the app's library provider and recommendations with mocked storage and device access. It only needs Git, Node.js, and npm; Android Studio, Xcode, Expo Go, and a phone are not required.
+
+6. **Run only the `playlistCreate` unit test.**
+
+   ```bash
+   npm test -- --runInBand test/playlistCreate.test.ts
+   ```
+
+### Running the `scanDevice` Tests on Another Computer
+
+Clone `main` and install the project dependencies:
 
 ```bash
-git clone --branch feature/scan-device-tests https://github.com/TristenBProgram/Echo-Vault-Repository.git
+git clone --branch main https://github.com/TristenBProgram/Echo-Vault-Repository.git
 cd Echo-Vault-Repository
 npm install
 npx jest src/lib/__tests__/scanner.test.ts --verbose
 ```
 
+<<<<<<< HEAD
 Already cloned the repository? Switch to the branch instead:
 
 ```bash
@@ -142,6 +157,9 @@ npx jest src/lib/__tests__/scanner.test.ts --verbose
 Once the tests are merged, the normal `main` clone works and the same `npx jest` command runs them.
 
 You should see `Tests: 16 passed, 16 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
+=======
+You should see `Tests: 9 passed, 9 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
+>>>>>>> origin/main
 
 ### Where the Code and Tests Are
 
@@ -149,6 +167,7 @@ You should see `Tests: 16 passed, 16 total`. The tests work on macOS, Windows, a
 |---|---|
 | `scanDevice()` function under test | [`src/lib/scanner.ts`](src/lib/scanner.ts) |
 | `scanDevice()` unit tests | [`src/lib/__tests__/scanner.test.ts`](src/lib/__tests__/scanner.test.ts) |
+| Music recommendation integration unit test | [`src/lib/__tests__/musicRecommendation.test.tsx`](src/lib/__tests__/musicRecommendation.test.tsx) |
 | Other unit tests | [`src/lib/__tests__/`](src/lib/__tests__/) |
 
 ### What the `scanDevice` Tests Cover
@@ -268,6 +287,22 @@ Tap the **heart** under a recommendation to like or unlike it. Likes also increa
 Tap **New mix** to rerank recommendations and start with a different song when at least two are available. **Play mix** starts the displayed mix; it stays in the playback queue while you browse other modes or update feedback. All modes show up to 20 songs.
 
 ### Useful Commands
+
+To run only the `musicRecommendation` unit test:
+
+```bash
+npx jest --runInBand src/lib/__tests__/musicRecommendation.test.tsx
+```
+
+To run that test along with recommendation ranking and storage tests:
+
+```bash
+npm run test:recommendations
+```
+
+The `TestMusicRecommendation` suite in `src/lib/__tests__/musicRecommendation.test.tsx` uses a fresh library provider and four controlled songs for each test. It tests the actual TypeScript recommender through `useLibrary().getRecommendations()`, with storage, imports, and device scanning mocked. Preferences are liked/hidden track IDs; songs use the production `Track` structure. There is no Python `RecommendationManager` or genre field in this app.
+
+The suite checks valid, empty, missing, malformed, and unknown preferences; one, multiple, and no matching songs; duplicate IDs; and empty libraries. Empty preferences still produce a personal mix from downloads, while **Liked songs** returns an empty list. Unknown track IDs are tested in place of unsupported genres. Additional checks verify live updates after listening, feedback, imports, removal, and reopening. Assertions compare actual song objects and recommendation reasons. The `npm run test:recommendations` command also runs the recommendation-ranking and persistence unit tests.
 
 | Command | What it does |
 |---|---|
