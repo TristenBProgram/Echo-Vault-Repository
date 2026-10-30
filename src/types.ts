@@ -3,6 +3,8 @@ export type Track = {
   id: string;
   /** What the audio player loads. */
   uri: string;
+  /** Original audio filename, used for exact QuickTransfer lookups. */
+  fileName?: string;
   title: string;
   artist: string;
   /** Length in seconds. 0 until known (imported files learn it on first play). */

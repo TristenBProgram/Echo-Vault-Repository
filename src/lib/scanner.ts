@@ -59,12 +59,13 @@ export async function importFromFiles(): Promise<Track[]> {
     try {
       const safeName = picked.name.replace(/[^\w.\- ()]/g, '_');
       const dest = new File(musicDir, `${Date.now()}-${tracks.length}-${safeName}`);
-      new File(picked.uri).copy(dest);
+      await new File(picked.uri).copy(dest);
 
       const { title, artist } = parseFilename(picked.name);
       tracks.push({
         id: dest.uri,
         uri: dest.uri,
+        fileName: safeName,
         title,
         artist,
         duration: 0,

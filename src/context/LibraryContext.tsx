@@ -52,6 +52,7 @@ type LibraryContextValue = {
   canScan: boolean;
   scan: () => Promise<void>;
   importFiles: () => Promise<void>;
+  addImportedTracks: (newTracks: Track[]) => void;
   removeTrack: (id: string) => void;
   markPlayed: (id: string) => void;
   setDuration: (id: string, seconds: number) => void;
@@ -149,6 +150,10 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     setNotice(null);
     const added = await importFromFiles();
     if (added.length) setTracks(prev => [...prev, ...added]);
+  }, []);
+
+  const addImportedTracks = useCallback((newTracks: Track[]) => {
+    if (newTracks.length) setTracks(prev => [...prev, ...newTracks]);
   }, []);
 
   const removeTrack = useCallback((id: string) => {
@@ -268,6 +273,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       canScan: Platform.OS === 'android',
       scan,
       importFiles,
+      addImportedTracks,
       removeTrack,
       markPlayed,
       setDuration,
@@ -293,6 +299,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     notice,
     scan,
     importFiles,
+    addImportedTracks,
     removeTrack,
     markPlayed,
     setDuration,
