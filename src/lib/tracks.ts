@@ -44,6 +44,7 @@ export function rowsToTracks(rows: MediaRow[]): Track[] {
       id: row.id,
       // On Android the asset id is a content:// URI the player can open directly.
       uri: row.id,
+      fileName: row.filename ?? undefined,
       title,
       artist,
       duration: seconds,

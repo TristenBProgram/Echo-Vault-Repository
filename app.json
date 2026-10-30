@@ -65,7 +65,9 @@
           ]
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-sharing",
+      "munim-ffmpeg"
     ],
     "experiments": {
       "typedRoutes": true,

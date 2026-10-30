@@ -19,6 +19,7 @@ describe('rowsToTracks', () => {
     expect(track).toEqual({
       id: 'content://media/1',
       uri: 'content://media/1',
+      fileName: 'Artist - Title.mp3',
       title: 'Title',
       artist: 'Artist',
       duration: 200,

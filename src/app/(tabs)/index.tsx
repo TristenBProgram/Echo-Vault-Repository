@@ -72,6 +72,20 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={20} color={colors.textDim} />
         </Pressable>
 
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open QuickTransfer"
+          onPress={() => router.push('/quick-transfer')}
+          style={({ pressed }) => [styles.recommendations, pressed && { opacity: 0.8 }]}
+        >
+          <Ionicons name="swap-horizontal" size={26} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.secondaryText}>QuickTransfer</Text>
+            <Text style={styles.recommendationsBody}>Bring music in or save a song as MP3</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.textDim} />
+        </Pressable>
+
         <Shelf
           title="Jump back in"
           items={lib.recentlyPlayed.slice(0, 10).map((t, i, list) => ({
@@ -110,6 +124,7 @@ export default function HomeScreen() {
 }
 
 function EmptyState() {
+  const router = useRouter();
   const lib = useLibrary();
   return (
     <SafeAreaView style={[styles.screen, styles.center, { padding: spacing.xl }]}>
@@ -141,6 +156,16 @@ function EmptyState() {
       >
         <Ionicons name="folder-open" size={20} color={lib.canScan ? colors.text : colors.onAccent} />
         <Text style={lib.canScan ? styles.secondaryText : styles.primaryText}>Add from Files</Text>
+      </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Open QuickTransfer"
+        style={({ pressed }) => [styles.secondary, styles.wide, pressed && { opacity: 0.8 }]}
+        onPress={() => router.push('/quick-transfer')}
+      >
+        <Ionicons name="swap-horizontal" size={20} color={colors.text} />
+        <Text style={styles.secondaryText}>QuickTransfer · convert to MP3</Text>
       </Pressable>
 
       {lib.notice && <Text style={[styles.notice, { textAlign: 'center' }]}>{lib.notice}</Text>}

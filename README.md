@@ -15,6 +15,8 @@ The goal of EchoVault is to make downloaded music easy to organize, browse, and 
 - Get offline music recommendations from your downloaded library
 - Provide play, pause, resume, and stop controls
 - Create and manage custom playlists
+- Import MP3, WAV, FLAC, M4A, AAC, and OGG through QuickTransfer, converting non-MP3 files to MP3 on the device
+- Export a library song as MP3 through the phone's share sheet
 - Keep playlist data after the application is closed and reopened
 - Handle missing metadata and playback errors safely
 - Add structured logs for important events, warnings, and errors
@@ -83,6 +85,12 @@ As a listener, I want useful track metadata and album art so that my local libra
 - Complete release planning, Sprint Review, and retrospective
 
 ## Reviewer Quick Start: Run the Unit Tests
+
+### QuickTransfer phone demo
+
+Open **QuickTransfer** from Home. Choose an audio file on the phone to add it to the library as MP3. On Android, **Refresh songs already on my phone** also makes scanned files available for export. Enter an exact library filename, or tap a listed song, then tap **Transfer as MP3** and choose a destination in the phone's share sheet. Blank, missing, and unsafe filenames show an error. A failed or interrupted conversion does not add a partial song to the library.
+
+Converting WAV, FLAC, M4A, AAC, or OGG uses a native FFmpeg module, so it requires an Android or iOS development build. Expo Go can still import an MP3 through QuickTransfer. The app's existing **Add from Files** flow remains available for direct imports. Run `npm test -- --runInBand` to execute the QuickTransfer and existing unit tests.
 
 You do not need a phone or Expo Go to review the tests. Follow these steps in a terminal.
 
