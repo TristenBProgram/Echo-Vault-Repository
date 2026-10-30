@@ -144,22 +144,7 @@ npm install
 npx jest src/lib/__tests__/scanner.test.ts --verbose
 ```
 
-<<<<<<< HEAD
-Already cloned the repository? Switch to the branch instead:
-
-```bash
-git fetch origin
-git checkout feature/scan-device-tests
-npm install
-npx jest src/lib/__tests__/scanner.test.ts --verbose
-```
-
-Once the tests are merged, the normal `main` clone works and the same `npx jest` command runs them.
-
 You should see `Tests: 16 passed, 16 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
-=======
-You should see `Tests: 9 passed, 9 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
->>>>>>> origin/main
 
 ### Where the Code and Tests Are
 
