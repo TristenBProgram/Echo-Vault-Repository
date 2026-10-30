@@ -117,7 +117,7 @@ You do not need a phone or Expo Go to review the tests. Follow these steps in a 
    npx jest src/lib/__tests__/scanner.test.ts --verbose
    ```
 
-   Expected: 9 passing tests.
+   Expected: 16 passing tests.
 
 5. **Run only the music recommendation unit test.**
 
@@ -144,7 +144,7 @@ npm install
 npx jest src/lib/__tests__/scanner.test.ts --verbose
 ```
 
-You should see `Tests: 9 passed, 9 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
+You should see `Tests: 16 passed, 16 total`. The tests work on macOS, Windows, and Linux. They use mocks for the phone's media library, so no phone, emulator, or Expo Go is needed. On Windows, run the commands in PowerShell, Git Bash, or Command Prompt.
 
 ### Where the Code and Tests Are
 
@@ -166,6 +166,7 @@ The Expo native modules (`expo-media-library`, `expo-file-system`, `expo-documen
 - Media rows are converted into tracks (title, artist, duration in seconds, `device` source)
 - Clips shorter than 30 seconds (ringtones) are skipped
 - A failing media query or permission request returns `error` with its message
+- Boundary cases: exactly 30 seconds is kept and 29.999 is skipped, 0 or missing duration is kept, the 3000 milliseconds-vs-seconds threshold, durations reported in seconds, a missing filename, and a 10,000-row result
 
 ### Optional: Other Checks the CI Runs
 
